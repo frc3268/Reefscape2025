@@ -30,7 +30,6 @@ import kotlin.math.sqrt
  */
 class RobotContainer {
     private val GeneralTab = Shuffleboard.getTab("General")
-    private val thingy = GeneralTab.add("Thing", 0.0).entry
     private val TroubleshootingTab = Shuffleboard.getTab(Constants.TROUBLESHOOTING_TAB)
 
     val driveSubsystem = SwerveDriveBase(Pose2d())

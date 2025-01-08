@@ -1,8 +1,14 @@
 package frc.robot.commands
 
 import edu.wpi.first.math.MathUtil
+import edu.wpi.first.math.controller.HolonomicDriveController
+import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.trajectory.Trajectory
+import edu.wpi.first.math.trajectory.TrajectoryConfig
+import edu.wpi.first.math.trajectory.TrajectoryGenerator
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import frc.lib.FieldPositions.obstacles
 import frc.lib.Obstacle
@@ -10,7 +16,12 @@ import frc.lib.rotation2dFromDeg
 import frc.lib.rotation2dFromRad
 import frc.lib.swerve.SwerveDriveBase
 import frc.lib.swerve.SwerveDriveConstants
+import frc.lib.swerve.SwerveDriveConstants.DrivetrainConsts.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
 import frc.lib.swerve.SwerveDriveConstants.DrivetrainConsts.MAX_SPEED_METERS_PER_SECOND
+import frc.lib.swerve.SwerveDriveConstants.DrivetrainConsts.kinematics
+import frc.lib.swerve.SwerveDriveConstants.DrivetrainConsts.thetaPIDController
+import frc.lib.swerve.SwerveDriveConstants.DrivetrainConsts.xPIDController
+import frc.lib.swerve.SwerveDriveConstants.DrivetrainConsts.yPIDController
 import frc.robot.Constants
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
@@ -24,48 +35,58 @@ class SwerveAutoDrive(
     private val setpoint: Supplier<Pose2d>,
     private val drive: SwerveDriveBase
 ): Command() {
-    private var index = 0
     private var points = mutableListOf<Pose2d>()
-    var next = Pose2d()
-    private var tolerance: Pose2d = Pose2d(0.1,0.1, 10.0.rotation2dFromDeg())
+    private var tolerance: Pose2d = Pose2d(0.01,0.01, 10.0.rotation2dFromDeg())
+
+    private var startTime:Double = 0.0
+
+    private val controller = HolonomicDriveController(
+        PIDController(xPIDController.p, xPIDController.i, xPIDController.d ),
+        PIDController(yPIDController.p, yPIDController.i, yPIDController.d ),
+        thetaPIDController
+    )
+
+    var trajectory:Trajectory = Trajectory()
 
     init {
         addRequirements(drive)
+        controller.setTolerance(tolerance)
     }
 
     override fun initialize() {
-        index = 0
         points = pathfind(drive.getPose(), setpoint.get())
         points.add(0, drive.getPose())
         drive.field.getObject("points").setPoses(points)
-        next = points[0]
+        val config = TrajectoryConfig(
+            MAX_SPEED_METERS_PER_SECOND,
+            MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ).apply { setKinematics(kinematics) }
+        trajectory = TrajectoryGenerator.generateTrajectory(
+            points,
+            config
+        )
+        startTime = Timer.getFPGATimestamp()
+        drive.field.getObject("tra").setTrajectory(trajectory)
     }
 
     override fun execute() {
         /*collect speeds based on which controls are used*/
 
-        val speeds = Pose2d(
-                SwerveDriveConstants.DrivetrainConsts.xPIDController.calculate(
-                    drive.getPose().x,
-                    TrapezoidProfile.State(next.x, 0.0)
-                ) * MAX_SPEED_METERS_PER_SECOND,
-                SwerveDriveConstants.DrivetrainConsts.yPIDController.calculate(
-                    drive.getPose().y,
-                    TrapezoidProfile.State(next.y, 0.0)
-                ) * MAX_SPEED_METERS_PER_SECOND,
-                (SwerveDriveConstants.DrivetrainConsts.thetaPIDController.calculate(
-                    drive.getPose().rotation.degrees,
-                    TrapezoidProfile.State(next.rotation.degrees, 0.0)
-                ) * SwerveDriveConstants.DrivetrainConsts.MAX_ANGULAR_VELOCITY_DEGREES_PER_SECOND).rotation2dFromDeg(),
+        val currentTime = Timer.getFPGATimestamp() - startTime
+        val desiredState = trajectory.sample(currentTime)
 
-            )
+        val speeds = controller.calculate(
+            drive.getPose(),
+            desiredState,
+            desiredState.poseMeters.rotation
+        )
 
         /* Drive */
         drive.setModuleStates(
             drive.constructModuleStatesFromChassisSpeeds(
-                speeds.x,
-                speeds.y,
-                speeds.rotation.degrees,
+                speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond,
+                speeds.omegaRadiansPerSecond.rotation2dFromRad().degrees,
                 true
             )
         )
@@ -73,18 +94,8 @@ class SwerveAutoDrive(
     }
 
     override fun isFinished(): Boolean {
-        if (
-            abs(drive.getPose().x - next.x) < tolerance.x &&
-            abs(drive.getPose().y - next.y) < tolerance.y &&
-            abs(drive.getPose().rotation.minus(next.rotation).degrees) < tolerance.rotation.degrees
-        ) {
-            if (index >= points.size - 1) {
-                return true
-            }
-            index++
-            next = points[index]
-        }
-        return false
+        return controller.atReference() &&
+               (Timer.getFPGATimestamp() - startTime) >= trajectory.totalTimeSeconds
     }
 
     override fun end(interrupted: Boolean) {
