@@ -130,11 +130,11 @@ class RobotContainer {
             }
         }
 
-        for (file:File in File(Filesystem.getDeployDirectory().toString() + "/buttons").listFiles()?.filter { it.isFile }!!){
-            GeneralTab.add(file.name,Json.decodeFromStream<AutoSequence>(
-                file.inputStream()
-            ).toCommandGroup(autos)).withWidget(BuiltInWidgets.kCommand)
-        }
+//        for (file:File in File(Filesystem.getDeployDirectory().toString() + "/buttons").listFiles()?.filter { it.isFile }!!){
+//            GeneralTab.add(file.name,Json.decodeFromStream<AutoSequence>(
+//                file.inputStream()
+//            ).toCommandGroup(autos)).withWidget(BuiltInWidgets.kCommand)
+//        }
     }
 
     /**

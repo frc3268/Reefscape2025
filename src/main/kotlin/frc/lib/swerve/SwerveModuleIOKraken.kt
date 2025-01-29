@@ -2,10 +2,6 @@ package frc.lib.swerve
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.hardware.TalonFX
-import com.revrobotics.CANSparkBase.IdleMode
-import com.revrobotics.CANSparkLowLevel
-import com.revrobotics.CANSparkMax
-import com.revrobotics.RelativeEncoder
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.AnalogEncoder

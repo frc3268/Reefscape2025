@@ -67,7 +67,13 @@ class SwerveDriveBase(startingPose: Pose2d) : SubsystemBase() {
         SwerveDriveConstants.DrivetrainConsts.thetaPIDController.enableContinuousInput(
                 180.0, -180.0
         )
+<<<<<<< Updated upstream
         camera = Camera("hawkeye")
+=======
+        if(Constants.mode == Constants.States.SIM){
+            camera = Camera("hawkeye")
+        }
+>>>>>>> Stashed changes
         zeroYaw()
         //https://github.com/Team364/BaseFalconSwerve/issues/8#issuecomment-1384799539
         Timer.delay(1.0)
@@ -80,12 +86,24 @@ class SwerveDriveBase(startingPose: Pose2d) : SubsystemBase() {
     }
 
     override fun periodic() {
+<<<<<<< Updated upstream
         //estimate robot pose based on what the encoders say
         poseEstimator.update(getYaw(), getModulePositions())
         //estimate robot pose based on what the camera sees
         if(gyroInputs.yawVelocityRadPerSec < Math.PI && Constants.mode != Constants.States.SIM) {
                 seesAprilTag.setBoolean(camera.captureFrame().hasTargets())
                 val visionEst: Optional<EstimatedRobotPose>? = camera.getEstimatedPose()
+=======
+        if(Constants.mode == Constants.States.SIM){
+            camera!!.captureFrame()
+        }
+        //estimate robot pose based on what the encoders say
+        poseEstimator.update(getYaw(), getModulePositions())
+        //estimate robot pose based on what the camera sees
+        if(gyroInputs.yawVelocityRadPerSec < Math.PI && Constants.mode != Constants.States.REAL) {
+                seesAprilTag.setBoolean(camera!!.frame.hasTargets())
+                val visionEst: Optional<EstimatedRobotPose>? = camera!!.getEstimatedPose()
+>>>>>>> Stashed changes
                 visionEst?.ifPresent { est ->
                     poseEstimator.addVisionMeasurement(
                         est.estimatedPose.toPose2d(),

@@ -20,5 +20,10 @@ object Constants {
 
     enum class States{REAL, SIM, REPLAY}
 
+<<<<<<< Updated upstream
     val mode = States.SIM
+=======
+    //any way to make this not hardocded?
+    val mode = States.REAL
+>>>>>>> Stashed changes
 }
