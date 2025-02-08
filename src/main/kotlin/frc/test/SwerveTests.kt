@@ -1,6 +1,6 @@
 package frc.test
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.Assert.assertTrue
 
 class SwerveTests {
 }
