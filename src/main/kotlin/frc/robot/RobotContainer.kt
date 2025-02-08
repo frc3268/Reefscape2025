@@ -7,20 +7,13 @@ import edu.wpi.first.wpilibj.Filesystem
 import edu.wpi.first.wpilibj.shuffleboard.*
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.*
-import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
 import frc.lib.*
-import frc.lib.FieldPositions.obstacles
 import frc.lib.swerve.SwerveDriveBase
-import frc.lib.swerve.SwerveDriveConstants
 import frc.robot.commands.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
-import java.util.concurrent.atomic.AtomicReference
-import java.util.function.Supplier
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
