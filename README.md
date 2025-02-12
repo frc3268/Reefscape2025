@@ -5,7 +5,7 @@
 **Features** swerve-drive code, camera code, autonomous code & dashboard code    
 **More** features to come, including but not limited to: more dashboard code, more odometry integrations, and documentation
 
-*This library tries to abide by the following "ideals":*
+*This library "tries" to abide by the following "ideals":*
 
 **Naming:**
 - Subsystems: End with "Subsystem"
@@ -13,6 +13,7 @@
 - Constants: UPPERCASE_WITH_UNDERSCORES
 - Methods/Functions: startWithLowerCaseThenCamelCase
 - Classes: CamelCase
+- Tests: End with "Test"
 
 **Structure:**
 - Lib: All the library (ie non wpilib) things go here
