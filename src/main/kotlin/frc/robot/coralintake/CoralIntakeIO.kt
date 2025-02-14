@@ -1,10 +1,10 @@
 package frc.robot.coralintake
 
 import edu.wpi.first.math.controller.PIDController
+import edu.wpi.first.math.geometry.Rotation2d
 import org.littletonrobotics.junction.AutoLog
 import org.littletonrobotics.junction.LogTable
 import org.littletonrobotics.junction.inputs.LoggableInputs
-import edu.wpi.first.math.geometry.Rotation2d
 
 
 interface CoralIntakeIO {
@@ -57,4 +57,8 @@ interface CoralIntakeIO {
     fun stopIntake()
 
     fun stop()
+
+    // Close all motors and cleanup.
+    // Warning: this should **never, ever, EVER, be a command or otherwise called unless it is a unittest! You have been warned!**
+    fun close()
 }

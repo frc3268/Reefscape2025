@@ -2,13 +2,7 @@ package frc.robot.coralintake
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.hardware.TalonFX
-import com.revrobotics.spark.SparkBase
-import com.revrobotics.spark.SparkLowLevel
-import com.revrobotics.spark.SparkMax
-import com.revrobotics.spark.config.SparkMaxConfig
 import edu.wpi.first.math.controller.PIDController
-import edu.wpi.first.math.util.Units
-import edu.wpi.first.wpilibj.DriverStation
 import frc.lib.rotation2dFromDeg
 
 class CoralIntakeIOKraken : CoralIntakeIO {
@@ -61,5 +55,10 @@ class CoralIntakeIOKraken : CoralIntakeIO {
     override fun stop() {
         stopIntake()
         stopJoint()
+    }
+
+    override fun close() {
+        intakeMotor.close()
+        jointMotor.close()
     }
 }

@@ -7,10 +7,10 @@ import com.revrobotics.spark.config.SparkMaxConfig
 import edu.wpi.first.math.controller.PIDController
 
 class CoralIntakeIOSparkMax : CoralIntakeIO {
-    val jointMotor = SparkMax(0, SparkLowLevel.MotorType.kBrushless)
+    val jointMotor = SparkMax(9, SparkLowLevel.MotorType.kBrushless)
     val jointConfig = SparkMaxConfig()
 
-    val intakeMotor = SparkMax(0, SparkLowLevel.MotorType.kBrushless)
+    val intakeMotor = SparkMax(10, SparkLowLevel.MotorType.kBrushless)
     val intakeConfig = SparkMaxConfig()
 
     override val pidController: PIDController = PIDController(0.0,0.0,0.0)
@@ -42,6 +42,11 @@ class CoralIntakeIOSparkMax : CoralIntakeIO {
     override fun stop() {
         stopIntake()
         stopJoint()
+    }
+
+    override fun close() {
+        intakeMotor.close()
+        jointMotor.close()
     }
 
     override fun updateInputs(inputs: CoralIntakeIO.Inputs) {

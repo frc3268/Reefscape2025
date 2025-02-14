@@ -7,7 +7,6 @@ import com.revrobotics.spark.SparkMax
 import com.revrobotics.spark.config.SparkMaxConfig
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.system.plant.DCMotor
-import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.simulation.RoboRioSim
 
 
@@ -16,11 +15,11 @@ class CoralIntakeIOSparkMaxSim : CoralIntakeIO {
 
     var neoGearbox: DCMotor = DCMotor.getNeo550(1)
 
-    val jointMotor = SparkMax(0, SparkLowLevel.MotorType.kBrushless)
+    val jointMotor = SparkMax(9, SparkLowLevel.MotorType.kBrushless)
     var jointSim: SparkMaxSim = SparkMaxSim(jointMotor, neoGearbox)
     val jointConfig = SparkMaxConfig()
 
-    val intakeMotor = SparkMax(0, SparkLowLevel.MotorType.kBrushless)
+    val intakeMotor = SparkMax(10, SparkLowLevel.MotorType.kBrushless)
     var intakeSim: SparkMaxSim = SparkMaxSim(intakeMotor, neoGearbox)
     val intakeConfig = SparkMaxConfig()
 
@@ -54,6 +53,11 @@ class CoralIntakeIOSparkMaxSim : CoralIntakeIO {
         stopJoint()
     }
 
+    override fun close() {
+        intakeMotor.close()
+        jointMotor.close()
+    }
+    
     override fun updateInputs(inputs: CoralIntakeIO.Inputs) {
 
         /*

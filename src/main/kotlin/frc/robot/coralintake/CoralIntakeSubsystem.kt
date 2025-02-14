@@ -1,6 +1,5 @@
 package frc.robot.coralintake
 
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -10,12 +9,15 @@ class CoralIntakeSubsystem(val io: CoralIntakeIO) : SubsystemBase() {
     val inputs = CoralIntakeIO.LoggedInputs()
 
     // Wtf, why does this not work?
+    // Oh ok I see
     val troubleshootingTab = Shuffleboard.getTab(Constants.TROUBLESHOOTING_TAB)
-    val jointAngleEntry = troubleshootingTab.add("Joint Angle", 0.0).withPosition(3, 0).withWidget(BuiltInWidgets.kGyro).entry
+
+    val jointAngleEntry = troubleshootingTab.add("Joint Angle", 0.0).withPosition(3, 0).entry
     val jointVelocityRotPerMinEntry = troubleshootingTab.add("Joint Velocity RPM", 0.0).withPosition(3, 1).entry
     val intakeVelocityRotPerMinEntry = troubleshootingTab.add("Intake Velocity RPM", 0.0).withPosition(3, 2).entry
 
     override fun periodic() {
+
         io.updateInputs(inputs)
         jointAngleEntry.setDouble(inputs.jointAngle.degrees)
         jointVelocityRotPerMinEntry.setDouble(inputs.jointVelocityRPM)
