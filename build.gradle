@@ -3,6 +3,7 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2025.2.1"
     id "org.jetbrains.kotlin.jvm" version '1.6.0'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.22'
+    id 'com.google.devtools.ksp' version '1.9.20-1.0.13'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -50,6 +51,10 @@ def includeDesktopSupport = false
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.10'
+    implementation 'com.google.dagger:dagger-compiler:2.51.1'
+
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
