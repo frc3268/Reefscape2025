@@ -72,7 +72,7 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
                             startedSpinning = true})
         .andThen(run{io.setMainAndRevVoltage(-0.4 * 12.0)})
         .andThen(run{})
-        .until { (abs(inputs.mainVelocityMetersPerSec)  +  abs(inputs.revVelocityMetersPerSec)) / 2 < 3900 && startedSpinning == true }
+        .until { (abs(inputs.mainVelocityMetersPerSec)  < 3900 ||  abs(inputs.revVelocityMetersPerSec) < 3900) && startedSpinning }
         .andThen(stopWheels())
         .andThen(runOnce{startedSpinning = false})
         .andThen(runOnce { holdIN = true }))
