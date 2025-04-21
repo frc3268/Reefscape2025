@@ -53,7 +53,7 @@ object Constants {
         LEVEL0(0.0),
         LEVEL1(0.5),
         LEVEL2(-22.0),
-        LEVEL3(-32.0),
+        LEVEL3(-35.0),
         LEVEL4(-50.0)
     }
 

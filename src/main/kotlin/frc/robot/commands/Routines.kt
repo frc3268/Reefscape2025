@@ -2,6 +2,7 @@ package frc.robot.commands
 
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.lib.FieldPositions
 import frc.lib.swerve.SwerveDriveBase
 import frc.robot.Constants
@@ -48,6 +49,7 @@ object Routines {
         elevator.setToPosition(level) ,
         algaeIntake.half(),
         algaeIntake.intake(),
+        WaitCommand(1.0),
         elevator.setToPosition(Constants.Levels.LEVEL0.lvl)
     )
 
@@ -59,20 +61,26 @@ object Routines {
 
 
     //stops everything, doesn't lower
-    fun stopAll(elevator: ElevatorSubsystem, algaeIntake: AlgaeIntakeSubsystem, coralIntake: CoralIntakeSubsystem, climberSubsystem: ClimberSubsystem): Command = SequentialCommandGroup(
-        elevator.runOnce { elevator.stop() },
-        algaeIntake.runOnce { algaeIntake.stopAll() },
-        coralIntake.runOnce { coralIntake.stop() },
-        climberSubsystem.run { climberSubsystem.stop() }
+    fun stopAll(elevator: ElevatorSubsystem, algaeIntake: AlgaeIntakeSubsystem, climberSubsystem: ClimberSubsystem): Command = SequentialCommandGroup(
+        algaeIntake.stopWheels(),
+        algaeIntake.raise(),
+        elevator.setToPosition(Constants.Levels.LEVEL0.lvl),
+        climberSubsystem.stop()
     )
 
-    fun inchForward(drive: SwerveDriveBase) = SwerveJoystickDrive(drive, {0.1}, {0.0}, {0.0}, {false}).withTimeout(0.5)
+    fun actualEmergency(elevator: ElevatorSubsystem, algaeIntake: AlgaeIntakeSubsystem, climberSubsystem: ClimberSubsystem) = SequentialCommandGroup(
+        algaeIntake.stopAll(),
+        elevator.stop(),
+        climberSubsystem.stop()
+    )
 
-    fun inchBack(drive: SwerveDriveBase) = SwerveJoystickDrive(drive, {-0.1}, {0.0}, {0.0}, {false}).withTimeout(0.5)
+    fun inchForward(drive: SwerveDriveBase, teleopCommand:Command) = SwerveJoystickDrive(drive, {0.2}, {0.0}, {0.0}, {false}).withTimeout(0.2).andThen(teleopCommand)
 
-    fun inchLeft(drive: SwerveDriveBase) = SwerveJoystickDrive(drive, {0.0}, {-0.1}, {0.0}, {false}).withTimeout(0.5)
+    fun inchBack(drive: SwerveDriveBase, teleopCommand:Command) = SwerveJoystickDrive(drive, {-0.2}, {0.0}, {0.0}, {false}).withTimeout(0.2).andThen(teleopCommand)
 
-    fun inchRight(drive: SwerveDriveBase) = SwerveJoystickDrive(drive, {0.0}, {0.1}, {0.0}, {false}).withTimeout(0.5)
+    fun inchLeft(drive: SwerveDriveBase, teleopCommand:Command) = SwerveJoystickDrive(drive, {0.0}, {-0.2}, {0.0}, {false}).withTimeout(0.2).andThen(teleopCommand)
+
+    fun inchRight(drive: SwerveDriveBase, teleopCommand:Command) = SwerveJoystickDrive(drive, {0.0}, {0.2}, {0.0}, {false}).withTimeout(0.2).andThen(teleopCommand)
 
 
     fun goLeftCommand(elevatorSubsystem: ElevatorSubsystem, coralIntakeSubsystem: CoralIntakeSubsystem, robot: RobotContainer): SequentialCommandGroup? =

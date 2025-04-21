@@ -35,7 +35,7 @@ class ClimberSubsystem(val io: ClimberIO) : SubsystemBase() {
 
     fun setToPosition(setPointDegrees: Double): Command =
         run {
-            io.setBothVolts(-0.4 * 12.0)
+            io.setBothVolts(-0.7 * 12.0)
         }.until { inputs.motorPositionDegrees < -730 }.andThen(stop())
 
     fun setToPositions(setPointDegrees: Double): Command =

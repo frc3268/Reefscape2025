@@ -21,7 +21,7 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
     val mainVelocityMetersPerSecEntry = troubleshootingTab.add("Main Velocity MPS", 0.0).withPosition(2, 2).entry
     val revVelocityMetersPerSecEntry = troubleshootingTab.add("Reverse Velocity MPS", 0.0).withPosition(2, 3).entry
 
-    val cntrl = ProfiledPIDController(io.pidController.p, io.pidController.i, io.pidController.d, TrapezoidProfile.Constraints(90.0, 120.0))
+    val cntrl = ProfiledPIDController(io.pidController.p, io.pidController.i, io.pidController.d, TrapezoidProfile.Constraints(100.0, 120.0))
 
     var setpoint = 0.0
     var stopped = false
@@ -37,7 +37,7 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
         troubleshootingTab.add("half", half()).withWidget(BuiltInWidgets.kCommand)
         troubleshootingTab.add("stop", stopJoint()).withWidget(BuiltInWidgets.kCommand)
         troubleshootingTab.add("intake", intake()).withWidget(BuiltInWidgets.kCommand)
-        troubleshootingTab.add("outtake", outtake()).withWidget(BuiltInWidgets.kCommand)
+        troubleshootingTab.add("outtake", runOnce{holdIN = false}.andThen({io.setMainAndRevVoltage(0.6 * 12.0)})).withWidget(BuiltInWidgets.kCommand)
         troubleshootingTab.add("stopwheels", stopWheels()).withWidget(BuiltInWidgets.kCommand)
     }
     
@@ -55,7 +55,7 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
         }
 
         if(holdIN){
-            io.setMainAndRevVoltage(-0.05)
+            io.setMainAndRevVoltage(-0.05 * 12.0)
         }
 
     }
@@ -125,14 +125,15 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
     fun raise(): Command =
         runOnce{stopped = true}.andThen(
         run {
-        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, 10.0))
-    }.until { (inputs.jointAngle - 10.0.rotation2dFromDeg()).degrees < 2.0 }.andThen(
+        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, 5.0))
+    }.until { (inputs.jointAngle - 5.0.rotation2dFromDeg()).degrees < 2.0 }.andThen(
         runOnce{
             cntrl.reset(inputs.jointAngle.degrees)
         }.andThen(
             runOnce {
-                setpoint = 10.0
+                setpoint = 5.0
                 stopped = false
+                holdIN = false
             } ) ))
 
     fun lower(): Command =
@@ -140,13 +141,13 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
             stopped = true
         }
             .andThen(run {
-        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, -110.0))
-    }.until { (inputs.jointAngle - (-110.0).rotation2dFromDeg()).degrees < 2.0 }.andThen(
+        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, -105.0))
+    }.until { (inputs.jointAngle - (-105.0).rotation2dFromDeg()).degrees < 2.0 }.andThen(
         runOnce{
             cntrl.reset(inputs.jointAngle.degrees)
         }.andThen(
             runOnce {
-                setpoint = -110.0
+                setpoint = -105.0
                 stopped = false } ) ))
 
 
@@ -155,14 +156,28 @@ class AlgaeIntakeSubsystem(val io: AlgaeIntakeIO) : SubsystemBase() {
             stopped = true
         }.andThen(
         run{
-        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, -80.0))
-        }.until { (inputs.jointAngle - (-80.0).rotation2dFromDeg()).degrees < 2.0 }.andThen(
+        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, -75.0))
+        }.until { (inputs.jointAngle - (-75.0).rotation2dFromDeg()).degrees < 2.0 }.andThen(
         runOnce{
             cntrl.reset(inputs.jointAngle.degrees)
         }.andThen(
             runOnce {
-                setpoint = -80.0
+                setpoint = -75.0
                 stopped = false } ) ))
+
+            fun threeQuarters(): Command =
+                runOnce {
+                    stopped = true
+                }.andThen(
+                    run{
+                        io.setJointVoltage(cntrl.calculate(inputs.jointAngle.degrees, -70.0))
+                    }.until { (inputs.jointAngle - (-70.0).rotation2dFromDeg()).degrees < 2.0 }.andThen(
+                        runOnce{
+                            cntrl.reset(inputs.jointAngle.degrees)
+                        }.andThen(
+                            runOnce {
+                                setpoint = -70.0
+                                stopped = false } ) ))
 
     fun dropAlgae() : Command = runOnce {
         outtake()

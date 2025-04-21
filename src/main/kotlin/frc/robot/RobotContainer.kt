@@ -117,7 +117,7 @@ class RobotContainer {
 
             autochooser.addOption("do nothing", WaitCommand(3.0))
 
-            autochooser.setDefaultOption("taxi", SwerveJoystickDrive(driveSubsystem, {1.0}, {0.0}, {0.0},{false} ).withTimeout(1.0))
+            autochooser.setDefaultOption("taxi", SwerveJoystickDrive(driveSubsystem, {1.0}, {0.0}, {0.0},{false} ).withTimeout(0.5))
 
 //            autochooser.addOption(
 //                "go left" ,
@@ -155,15 +155,38 @@ class RobotContainer {
             )
 
 //            //just lower the elevator little bro
-//            driverController.y().onTrue(
-//                coralIntakeSubsystem!!.stopIntake().
-//                andThen(coralIntakeSubsystem!!.lower().alongWith(elevatorSubsystem!!.setToPosition(0.0)))
-//            )
+            driverController.y().onTrue(
+                Routines.stopAll(elevatorSubsystem!!, algaeIntakeSubsystem!!, climberSubsystem!!)
+            )
 
-            driverController.povDown().onTrue(Routines.inchBack(driveSubsystem))
-            driverController.povUp().onTrue(Routines.inchForward(driveSubsystem))
-            driverController.povRight().onTrue(Routines.inchRight(driveSubsystem))
-            driverController.povLeft().onTrue(Routines.inchLeft(driveSubsystem))
+            driverController.povUp().onTrue(Routines.inchBack(driveSubsystem, SwerveJoystickDrive(
+                driveSubsystem,
+                { driverController.getRawAxis(1) },
+                { driverController.getRawAxis(0) },
+                { -driverController.getRawAxis(4) },
+                { true }
+            )))
+            driverController.povDown().onTrue(Routines.inchForward(driveSubsystem, SwerveJoystickDrive(
+                driveSubsystem,
+                { driverController.getRawAxis(1) },
+                { driverController.getRawAxis(0) },
+                { -driverController.getRawAxis(4) },
+                { true }
+            )))
+            driverController.povRight().onTrue(Routines.inchRight(driveSubsystem, SwerveJoystickDrive(
+                driveSubsystem,
+                { driverController.getRawAxis(1) },
+                { driverController.getRawAxis(0) },
+                { -driverController.getRawAxis(4) },
+                { true }
+            )))
+            driverController.povLeft().onTrue(Routines.inchLeft(driveSubsystem, SwerveJoystickDrive(
+                driveSubsystem,
+                { driverController.getRawAxis(1) },
+                { driverController.getRawAxis(0) },
+                { -driverController.getRawAxis(4) },
+                { true }
+            )))
 
             GeneralTab.add("0",elevatorSubsystem!!.setToPosition(Constants.Levels.LEVEL0.lvl) )
             GeneralTab.add("1",elevatorSubsystem!!.setToPosition(Constants.Levels.LEVEL1.lvl) )

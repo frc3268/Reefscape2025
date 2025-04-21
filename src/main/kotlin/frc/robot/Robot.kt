@@ -1,5 +1,6 @@
 package frc.robot
 
+import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj2.command.Command
@@ -25,8 +26,10 @@ class Robot : TimedRobot() {
      * initialization code.
      */
     override fun robotInit() {
-        // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+        // Instantiate our RobotContainer.  This will perform all our button bindings, and put our-
         // autonomous chooser on the dashboard.
+        //CameraServer.startAutomaticCapture()
+
         if (isReal()) {
             Constants.mode = Constants.States.REAL
             PowerDistribution(1, PowerDistribution.ModuleType.kRev) // Enables power distribution logging
